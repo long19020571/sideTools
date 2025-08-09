@@ -6,7 +6,7 @@
   </ExtensionList>
   <ExecutionEnvironment>
     <HostList>
-      <Host Name="ILST" Version="[22.0,99.9]" />
+      <Host Name="ILST" Version="[17.0,99.9]" />
     </HostList>
     <LocaleList>
       <Locale Code="All" />
@@ -20,7 +20,7 @@
       <DispatchInfo>
         <Resources>
           <MainPath>./index.html</MainPath>
-          <ScriptPath>./jsx/host.jsx</ScriptPath>
+          <!-- <ScriptPath>./js/main.js</ScriptPath> -->
         </Resources>
         <Lifecycle>
           <AutoVisible>true</AutoVisible>
@@ -38,12 +38,12 @@
               <Width>200</Width>
             </MinSize>
           </Geometry>
-          <Icons>
+          <!-- <Icons>
             <Icon Type="Normal">./icons/icon.png</Icon>
             <Icon Type="RollOver">./icons/icon.png</Icon>
             <Icon Type="DarkNormal">./icons/icon.png</Icon>
             <Icon Type="DarkRollOver">./icons/icon.png</Icon>
-          </Icons>
+          </Icons> -->
         </UI>
       </DispatchInfo>
     </Extension>

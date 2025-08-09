@@ -25,3 +25,18 @@ function parsePathItem(pItem) {
     }
     return ring;
 }
+function drawCrossLine(x, y, lineLength) {
+    var doc = app.activeDocument;
+    var verticalLine = doc.pathItems.add();
+    verticalLine.setEntirePath([[x, y - lineLength/2], [x, y + lineLength/2]]);
+    verticalLine.stroked = true;
+    verticalLine.strokeWidth = 1;
+    verticalLine.filled = false;
+
+    // Đường ngang song song trục hoành (qua y)
+    var horizontalLine = doc.pathItems.add();
+    horizontalLine.setEntirePath([[x - lineLength/2, y], [x + lineLength/2, y]]);
+    horizontalLine.stroked = true;
+    horizontalLine.strokeWidth = 1;
+    horizontalLine.filled = false;
+}

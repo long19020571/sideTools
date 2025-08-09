@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ExtensionManifest Version="7.0" ExtensionBundleId="com.L9999.sidetools" ExtensionBundleVersion="1.0.0"
+                  ExtensionBundleName="Side Tools" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <ExtensionList>
+    <Extension Id="com.L9999.sidetools.panel" Version="1.0.0" />
+  </ExtensionList>
+  <ExecutionEnvironment>
+    <HostList>
+      <Host Name="ILST" Version="[22.0,99.9]" />
+    </HostList>
+    <LocaleList>
+      <Locale Code="All" />
+    </LocaleList>
+    <RequiredRuntimeList>
+      <RequiredRuntime Name="CSXS" Version="9.0" />
+    </RequiredRuntimeList>
+  </ExecutionEnvironment>
+  <DispatchInfoList>
+    <Extension Id="com.L9999.sidetools.panel">
+      <DispatchInfo>
+        <Resources>
+          <MainPath>./index.html</MainPath>
+          <ScriptPath>./jsx/host.jsx</ScriptPath>
+        </Resources>
+        <Lifecycle>
+          <AutoVisible>true</AutoVisible>
+        </Lifecycle>
+        <UI>
+          <Type>Panel</Type>
+          <Menu>Side Tools</Menu>
+          <Geometry>
+            <Size>
+              <Height>400</Height>
+              <Width>300</Width>
+            </Size>
+            <MinSize>
+              <Height>200</Height>
+              <Width>200</Width>
+            </MinSize>
+          </Geometry>
+          <Icons>
+            <Icon Type="Normal">./icons/icon.png</Icon>
+            <Icon Type="RollOver">./icons/icon.png</Icon>
+            <Icon Type="DarkNormal">./icons/icon.png</Icon>
+            <Icon Type="DarkRollOver">./icons/icon.png</Icon>
+          </Icons>
+        </UI>
+      </DispatchInfo>
+    </Extension>
+  </DispatchInfoList>
+</ExtensionManifest>

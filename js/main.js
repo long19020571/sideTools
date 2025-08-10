@@ -2,6 +2,8 @@
 (function() {
     'use strict';
     var csInterface = new CSInterface();
+    csInterface.evalScript('$.evalFile("' +
+    csInterface.getSystemPath(SystemPath.EXTENSION) + '/host/host.jsx")');
     init();
     // Initialize when DOM is loaded
     function init() {
@@ -11,18 +13,11 @@
     function setupEventListeners() {
         // Shape creation buttons
         document.getElementById('run').addEventListener('click', function() {
-            csInterface.evalScript('getSelectedPolygon()', function (result) {
-            let l = result.length;
-            if (result.length > 0) {
-                for(let i = 0; i < l; ++i ) {
-                    let cog = centerOfGravity(result[i]);
-                    csInterface.evalScript(`drawCrossLines(${cog.x}, ${cog.y})`);
-                }
-            } else {
-                alert("No polygon selected")
-            }
-            });
+            alert("starting");
+            csInterface.evalScript('drawRectangle()');
+            csInterface.evalScript('drawCenterOfGravity()');
         });
+
     }
     /*
         Cubic Bezier
@@ -111,7 +106,7 @@
 
         let Cx = Nx_total / (3 * A_total);
         let Cy = Ny_total / (3 * A_total);
-
+        alert("x :" + Cx + ", y :" + Cy);
         return { x: Cx, y: Cy, area: A_total };
     }
 

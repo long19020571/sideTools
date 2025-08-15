@@ -10,8 +10,8 @@ function drawCenterOfGravity() {
     alert("Số polygon: " + l);
 
     for (var i = 0; i < l; ++i) {
-        var cog = shapeCentroid(polygons[i]);
-        drawCrossLine(cog.centroid[0], cog.centroid[1], 50);
+        var cog = calculateBezierShapeCenterOfMass(polygons[i]);
+        drawCrossLine(cog.x, cog.y, 50);
     }
 }
 
@@ -87,106 +87,191 @@ function drawCrossLine(x, y, lineLength) {
     hLine.filled = false;
 }
 
-// BY MYSELF
-// Tính diện tích và moment của một đoạn cubic Bézier
-function bezierSegmentAreaCentroid(P0, P1) {
-    var x0 = P0[0], y0 = P0[1];
-    var x1 = P0[4], y1 = P0[5];
-    var x2 = P1[2], y2 = P1[3];
-    var x3 = P1[0], y3 = P1[1];
+// final
+// function calculateBezierArea(P1,P3) {
 
-    var ax = -x0 + 3*x1 - 3*x2 + x3;
-    var bx = 3*x0 - 6*x1 + 3*x2;
-    var cx = -3*x0 + 3*x1;
-    var dx = x0;
+//     // Lấy tọa độ x, y từ các điểm
+//     const [x0, y0] = [P1[0], P1[1]];
+//     const [x1, y1] = [P1[4], P1[5]];
+//     const [x2, y2] = [P3[2], P3[3]];
+//     const [x3, y3] = [P3[0], P3[1]];
 
-    var ay = -y0 + 3*y1 - 3*y2 + y3;
-    var by = 3*y0 - 6*y1 + 3*y2;
-    var cy = -3*y0 + 3*y1;
-    var dy = y0;
+//     // Tính các thành phần của biểu thức diện tích
+//     const term1 = (x1 - x0) * (y0 + 3 * y1 + y2);
+//     const term2 = (x2 - x1) * (y0 + 4 * y1 + 4 * y2 + y3);
+//     const term3 = (x3 - x2) * (y1 + 3 * y2 + y3);
 
-    // Công thức diện tích (signed)
-    var A = (
-        ( 3*(bx*cy - cx*by) + 2*(cx*dy - dx*cy) + 3*(dx*by - bx*dy) )/20
-        + ( (ax*cy - cx*ay) + (bx*dy - dx*by) )/10
-        + (ax*dy - dx*ay)/20
-        + (bx*ay - ax*by)/30
-        + (ax*by - bx*ay)/60
-    );
+//     // Tính diện tích theo công thức
+//     const area = (1 / 20) * (term1 + term2 + term3);
 
-    // Tích phân moment
-    var Mx = (
-        ( 3*(bx*(cy*cy) - cx*(by*cy)) + 2*(cx*(dy*cy) - dx*(cy*cy)) + 3*(dx*(by*cy) - bx*(dy*cy)) )/40
-    ); // Đây cần chỉnh chính xác hơn nếu cần moment hoàn toàn chính xác — tạm thời placeholder
-
-    var My = (
-        ( 3*(by*(cx*cx) - cy*(bx*cx)) + 2*(cy*(dx*cx) - dy*(cx*cx)) + 3*(dy*(bx*cx) - by*(dx*cx)) )/40
-    ); // Placeholder
-
-    return [A, Mx, My];
-}
-
-// Tính diện tích có hướng của 1 ring
-function ringSignedArea(ring) {
-    var area = 0;
-    var n = ring.length;
-    for (var i = 0; i < n; i++) {
-        var P0 = ring[i];
-        var P1 = ring[(i+1) % n];
-        var seg = bezierSegmentAreaCentroid(P0, P1);
-        area += seg[0];
+//     return area;
+// }
+function calculateBezierShapeCenterOfMass(shape) {
+    if (!shape || shape.length === 0) {
+        throw "Cần ít nhất một ring.";
     }
-    return area;
-}
 
-// Xác định ring có diện tích lớn nhất
-function findOuterRingIndex(rings) {
-    var maxArea = -Infinity;
-    var outerIndex = -1;
-    for (var i = 0; i < rings.length; i++) {
-        var area = Math.abs(ringSignedArea(rings[i]));
-        if (area > maxArea) {
-            maxArea = area;
+    // Bảng integrals cho moment (integrate B_j B_m C_k dt)
+    var integrals = [
+        [ // j=0
+            [1/9, 1/36, 1/252], 
+            [1/24, 1/42, 1/168], 
+            [1/84, 1/84, 1/210], 
+            [1/504, 1/315, 1/504]
+        ],
+        [ // j=1
+            [1/24, 1/42, 1/168], 
+            [1/28, 1/28, 1/70], 
+            [1/56, 1/35, 1/56], 
+            [1/210, 1/84, 1/84]
+        ],
+        [ // j=2
+            [1/84, 1/84, 1/210], 
+            [1/56, 1/35, 1/56], 
+            [1/70, 1/28, 1/28], 
+            [1/168, 1/42, 1/24]
+        ],
+        [ // j=3
+            [1/504, 1/315, 1/504], 
+            [1/210, 1/84, 1/84], 
+            [1/168, 1/42, 1/24], 
+            [1/252, 1/36, 1/9]
+        ]
+    ];
+
+    // Bảng area_integrals cho area (integrate B_j C_k dt)
+    var areaIntegrals = [
+        [1/6, 1/15, 1/60],
+        [1/10, 1/10, 1/20],
+        [1/20, 3/20, 1/10],
+        [1/60, 1/15, 1/6]
+    ];
+
+    // Hàm xây dựng segments từ ring
+    function buildSegments(ring) {
+        var segments = [];
+        var len = ring.length;
+        for (var i = 0; i < len; i++) {
+            var current = ring[i];
+            var next = ring[(i + 1) % len];
+            var p0 = { x: current[0], y: current[1] };
+            var p1 = { x: current[4], y: current[5] };
+            var p2 = { x: next[2], y: next[3] };
+            var p3 = { x: next[0], y: next[1] };
+            segments.push([p0, p1, p2, p3]);
+        }
+        return segments;
+    }
+
+    // Hàm tính area, mx, my cho một ring
+    function calculateRingMetrics(ring) {
+        var segments = buildSegments(ring);
+        var area = 0;
+        var mx = 0;
+        var my = 0;
+
+        for (var s = 0; s < segments.length; s++) {
+            var seg = segments[s];
+            var p0 = seg[0], p1 = seg[1], p2 = seg[2], p3 = seg[3];
+            var x = [p0.x, p1.x, p2.x, p3.x];
+            var y = [p0.y, p1.y, p2.y, p3.y];
+            var dx = [x[1] - x[0], x[2] - x[1], x[3] - x[2]];
+            var dy = [y[1] - y[0], y[2] - y[1], y[3] - y[2]];
+
+            // Tính area_s
+            var area_s = 0;
+            for (var j = 0; j < 4; j++) {
+                for (var k = 0; k < 3; k++) {
+                    area_s += (x[j] * dy[k] - y[j] * dx[k]) * areaIntegrals[j][k];
+                }
+            }
+            area_s *= 3 / 2;
+            area += area_s;
+
+            // Tính mx_s
+            var mx_s = 0;
+            for (var j2 = 0; j2 < 4; j2++) {
+                for (var m2 = 0; m2 < 4; m2++) {
+                    for (var k2 = 0; k2 < 3; k2++) {
+                        mx_s += (x[j2] * x[m2] * dy[k2] - x[j2] * y[m2] * dx[k2]) * integrals[j2][m2][k2];
+                    }
+                }
+            }
+            mx_s *= 3 / 2;
+            mx += mx_s;
+
+            // Tính my_s
+            var my_s = 0;
+            for (var j3 = 0; j3 < 4; j3++) {
+                for (var m3 = 0; m3 < 4; m3++) {
+                    for (var k3 = 0; k3 < 3; k3++) {
+                        my_s += (y[j3] * x[m3] * dy[k3] - y[j3] * y[m3] * dx[k3]) * integrals[j3][m3][k3];
+                    }
+                }
+            }
+            my_s *= 3 / 2;
+            my += my_s;
+        }
+
+        return { area: area, mx: mx, my: my };
+    }
+
+    // Tính metrics cho tất cả rings
+    var metrics = [];
+    for (var idx = 0; idx < shape.length; idx++) {
+        metrics.push(calculateRingMetrics(shape[idx]));
+    }
+
+    // Tìm outer ring: ring có |area| lớn nhất
+    var maxAbsArea = 0;
+    var outerIndex = 0;
+    for (var i = 0; i < metrics.length; i++) {
+        var absArea = Math.abs(metrics[i].area);
+        if (absArea > maxAbsArea) {
+            maxAbsArea = absArea;
             outerIndex = i;
         }
     }
-    return outerIndex;
-}
 
-// Tính centroid của hình với outer và holes
-function shapeCentroid(rings) {
-    var outerIdx = findOuterRingIndex(rings);
-    var totalA = 0, totalMx = 0, totalMy = 0;
-
-    for (var r = 0; r < rings.length; r++) {
-        var ring = rings[r];
-        var ringA = 0, ringMx = 0, ringMy = 0;
-        var n = ring.length;
-
-        for (var i = 0; i < n; i++) {
-            var P0 = ring[i];
-            var P1 = ring[(i+1) % n];
-            var seg = bezierSegmentAreaCentroid(P0, P1);
-            ringA += seg[0];
-            ringMx += seg[1];
-            ringMy += seg[2];
-        }
-
-        if (r === outerIdx) {
-            totalA += ringA;
-            totalMx += ringMx;
-            totalMy += ringMy;
-        } else {
-            totalA -= Math.abs(ringA);
-            totalMx -= Math.abs(ringMx);
-            totalMy -= Math.abs(ringMy);
-        }
+    // Điều chỉnh dấu cho outer: làm area dương
+    var totalArea = metrics[outerIndex].area;
+    var totalMx = metrics[outerIndex].mx;
+    var totalMy = metrics[outerIndex].my;
+    if (totalArea < 0) {
+        totalArea = -totalArea;
+        totalMx = -totalMx;
+        totalMy = -totalMy;
     }
 
-    var cx = totalMx / totalA;
-    var cy = totalMy / totalA;
+    // Cho các holes: làm area âm
+    for (var i2 = 0; i2 < metrics.length; i2++) {
+        if (i2 === outerIndex) continue;
+        var holeArea = metrics[i2].area;
+        var holeMx = metrics[i2].mx;
+        var holeMy = metrics[i2].my;
+        if (holeArea > 0) {
+            holeArea = -holeArea;
+            holeMx = -holeMx;
+            holeMy = -holeMy;
+        }
+        totalArea += holeArea;
+        totalMx += holeMx;
+        totalMy += holeMy;
+    }
 
-    return { area: totalA, centroid: [cx, cy], outerIndex: outerIdx };
+    if (totalArea === 0) {
+        throw "Diện tích tổng bằng 0, không thể tính trọng tâm.";
+    }
+
+    var xBar = totalMx / totalArea;
+    var yBar = totalMy / totalArea;
+
+    return { x: xBar, y: yBar };
 }
+
+// ===== Ví dụ sử dụng =====
+// shape = [[[0,0,0,0,1,1], [3,0,2,1,2,1]]];
+// var center = calculateBezierShapeCenterOfMass(shape);
+// $.writeln("Trọng tâm: x=" + center.x + ", y=" + center.y);
 
 

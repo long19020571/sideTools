@@ -12,10 +12,11 @@
     
     function setupEventListeners() {
         // Shape creation buttons
-        document.getElementById('run').addEventListener('click', function() {
-            alert("starting");
-            csInterface.evalScript('drawRectangle()');
-            csInterface.evalScript('drawCenterOfGravity()');
+        document.getElementById('makeRefPoint').addEventListener('click', function() {
+            var black = document.getElementById('isBlack').checked,
+                inner = document.getElementById('innerArt').checked;
+            csInterface.evalScript(`makeReferencePoint(${black}, ${inner})`);
+
         });
 
     }

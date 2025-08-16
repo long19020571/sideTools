@@ -2,7 +2,57 @@
 // Tính và vẽ trọng tâm CHÍNH XÁC sử dụng DIỆN TÍCH để xác định outer ring
 // ==============================
 
-drawCenterOfGravity();
+function makeReferencePoint(black, inner) {
+    var doc = app.activeDocument;
+    doc.fitArtboardToSelectedArt(0);
+
+    var d = 5 * 72 / 25.4;
+    var aX0 = doc.artboards[0].artboardRect[0],
+        aY0 = doc.artboards[0].artboardRect[1],
+        aX2 = doc.artboards[0].artboardRect[2],
+        aY2 = doc.artboards[0].artboardRect[3];
+    alert(aX0 + " & " +aY0 + " & " +aX2 + " & " +aY2);
+    var pc0 = [], pc1 = [], pc2 = [], pc3 = []; 
+    if(inner) {
+        pc0[0] = aX0   ; pc0[1] = aY0;
+        pc1[0] = aX2 -d; pc1[1] = aY0;
+        pc2[0] = aX2 -d; pc2[1] = aY2 +d;
+        pc3[0] = aX0   ; pc3[1] = aY2 +d;
+    } else {
+        pc0[0] = aX0 -d; pc0[1] = aY0 +d;
+        pc1[0] = aX2   ; pc1[1] = aY0 +d;
+        pc2[0] = aX2   ; pc2[1] = aY2   ;
+        pc3[0] = aX0 -d; pc3[1] = aY2   ;
+    }
+    var fill = new RGBColor();
+    if(black) {
+        fill.red = 0;
+        fill.green = 0;
+        fill.blue = 0;
+    } else {
+        fill.red = 255;
+        fill.green = 255;
+        fill.blue = 255;
+    }
+    var noColor = new NoColor();
+
+    var c0 = doc.pathItems.ellipse(0,0, d,d);
+    c0.position = pc0; 
+    c0.fillColor = fill;
+    c0.strokeColor = noColor
+    var c1 = doc.pathItems.ellipse(0,0, d,d);
+    c1.position = pc1; 
+    c1.fillColor = fill;
+    c1.strokeColor = noColor
+    var c2 = doc.pathItems.ellipse(0,0, d,d);
+    c2.position = pc2; 
+    c2.fillColor = fill;
+    c2.strokeColor = noColor
+    var c3 = doc.pathItems.ellipse(0,0, d,d);
+    c3.position = pc3; 
+    c3.fillColor = fill;
+    c3.strokeColor = noColor
+}
 
 function drawCenterOfGravity() {
     var polygons = getSelectedPolygon();

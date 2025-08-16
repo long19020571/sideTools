@@ -8,18 +8,16 @@
 <body>
     <div class="container">
         <div class="section">
-            <label for="progress">Process :</label>
-            <progress id="progress" value="0" max="100" style="width: 100%;"></progress>
+            <p id="message">Make Reference point</p>
         </div>
         <div class="section">
-            <p id="message">What's happen ?</p>
+            <input type="checkbox" id="isBlack">
+            <label for="isNumbering">Black ?</label>
+            <input type="checkbox" id="innerArt">
+            <label for="isNumbering">Inner Artboard ?</label>
         </div>
         <div class="section">
-            <input type="checkbox" id="isNumbering">
-            <label for="isNumbering">Numbering colors</label>
-        </div>
-        <div class="section">
-            <button id="run">Run</button>
+            <button id="makeRefPoint">Make</button>
         </div>
     </div>
     <script src="js/CSInterface.js"></script>

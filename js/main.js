@@ -18,6 +18,9 @@
             csInterface.evalScript(`makeReferencePoint(${black}, ${inner})`);
 
         });
+        document.getElementById('fitArtboardToSelectedArt').addEventListener('click', function() {
+            csInterface.evalScript(`fitArtboardToSelectedArt()`);
+        });
 
     }
     /*

@@ -1,26 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-    <meta charset="utf-8">
-    <title>Colors to Numbers</title>
-    <link rel="stylesheet" type="text/css" href="css/style.css">
+  <meta charset="utf-8">
+  <title>Colors to Numbers</title>
+  <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="section">
-            <p id="message">Make Reference point</p>
-        </div>
-        <div class="section">
-            <input type="checkbox" id="isBlack">
-            <label for="isNumbering">Black ?</label>
-            <input type="checkbox" id="innerArt">
-            <label for="isNumbering">Inner Artboard ?</label>
-        </div>
-        <div class="section">
-            <button id="makeRefPoint">Make</button>
-        </div>
+  <div class="container">
+    <div class="section">
+      <p id="message" class="title">Make Reference point</p>
+      <label><input type="checkbox" id="isBlack"> Black?</label>
+      <label><input type="checkbox" id="innerArt"> Inner Artboard?</label>
+      <button id="makeRefPoint" class="btn">Make</button>
     </div>
-    <script src="js/CSInterface.js"></script>
-    <script src="js/main.js"></script>
+
+    <div class="section">
+      <button id="fitArtboardToSelectedArt" class="btn">Fit Artboard to</button>
+    </div>
+  </div>
+
+  <script src="js/CSInterface.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>

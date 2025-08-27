@@ -11,7 +11,6 @@ function makeReferencePoint(black, inner) {
         aY0 = doc.artboards[0].artboardRect[1],
         aX2 = doc.artboards[0].artboardRect[2],
         aY2 = doc.artboards[0].artboardRect[3];
-    alert(aX0 + " & " +aY0 + " & " +aX2 + " & " +aY2);
     var pc0 = [], pc1 = [], pc2 = [], pc3 = []; 
     if(inner) {
         pc0[0] = aX0   ; pc0[1] = aY0;
@@ -317,6 +316,11 @@ function calculateBezierShapeCenterOfMass(shape) {
     var yBar = totalMy / totalArea;
 
     return { x: xBar, y: yBar };
+}
+
+function fitArtboardToSelectedArt() {
+    var doc = app.activeDocument;
+    doc.fitArtboardToSelectedArt(0);
 }
 
 // ===== Ví dụ sử dụng =====

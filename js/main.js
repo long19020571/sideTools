@@ -21,6 +21,10 @@
         document.getElementById('fitArtboardToSelectedArt').addEventListener('click', function() {
             csInterface.evalScript(`fitArtboardToSelectedArt()`);
         });
+        centerOfMass
+        document.getElementById('centerOfMass').addEventListener('click', function() {
+            csInterface.evalScript(`drawCenterOfGravity`);
+        });
 
     }
     /*

@@ -434,81 +434,62 @@ function parsePathItem(pItem) {
     }
     return ring;
 }
+
 function sliceImage() {
     var doc = app.activeDocument;
-
-// --- Lấy ảnh raster được chọn ---
-var rasterItems = doc.rasterItems;
-if (rasterItems.length === 0) {
-    alert("No raster image found in the document.");
-    return;
-}
-var raster = null;
-for (var i = 0; i < rasterItems.length; i++) {
-    if (rasterItems[i].selected) {
-        raster = rasterItems[i]; // ảnh gốc được chọn
-        break;
+    var rasterItems = doc.rasterItems;
+    if (rasterItems.length === 0) {
+        alert("No raster image found in the document.");
+        return;
     }
-}
-if (raster == null) {
-    alert("Please select a raster image along with paths.");
-    return;
-}
-
-// --- Lấy các path được chọn ---
-var paths = doc.selection;
-if (paths.length === 0) {
-    alert("No path found in the selection.");
-    return;
-}
-
-// --- Layer kết quả ---
-var newLayer = doc.layers.add();
-newLayer.name = "Clipped Results";
-
-// --- Tạo clipping group cho từng path ---
-for (var i = 0; i < paths.length; i++) {
-    var path = paths[i];
-    
-
-    // --- Nếu PathItem ---
-    if (path.typename === "PathItem" && path.parent.typename !== "CompoundPathItem") {
-        var group = newLayer.groupItems.add();
-
-    // Duplicate raster
-    var dupRaster = raster.duplicate(group, ElementPlacement.PLACEATBEGINNING);
-
-    // Duplicate path
-    var dupPath = path.duplicate(group, ElementPlacement.PLACEATEND);
-
-        dupPath.clipping = true;
-        group.clipped = true;
-
-    // --- Nếu CompoundPathItem ---
-    } else if (path.typename === "CompoundPathItem") {
-        var group = newLayer.groupItems.add();
-
-    // Duplicate raster
-    var dupRaster = raster.duplicate(group, ElementPlacement.PLACEATBEGINNING);
-
-    // Duplicate path
-    var dupPath = path.duplicate(group, ElementPlacement.PLACEATEND);
-        // Illustrator bug: không thể set clipping trực tiếp trên CompoundPathItem
-        // Giải pháp: tạo một path dummy, bật group.clipped, rồi thay thế bằng sub-path
-        var dummy = group.pathItems.add();
-        dummy.move(group, ElementPlacement.PLACEATBEGINNING);
-
-        group.clipped = true; // cần có 1 PathItem hợp lệ để bật clipped
-
-        // Xóa dummy và gán clipping cho subpath đầu tiên
-        dummy.remove();
-
-        if (dupPath.pathItems.length > 0) {
-            dupPath.pathItems[0].clipping = true;
+    var raster = null;
+    for (var i = 0; i < rasterItems.length; i++) {
+        if (rasterItems[i].selected) {
+            raster = rasterItems[i];
+            break;
         }
     }
-}
+    if (raster == null) {
+        alert("Please select a raster image along with paths.");
+        return;
+    }
 
+    var paths = doc.selection;
+    if (paths.length === 0) {
+        alert("No path found in the selection.");
+        return;
+    }
+
+    var newLayer = doc.layers.add();
+    newLayer.name = "Clipped Results";
+
+    for (var i = 0; i < paths.length; i++) {
+        var path = paths[i];
+        
+
+        if (path.typename === "PathItem" && path.parent.typename !== "CompoundPathItem") {
+            var group = newLayer.groupItems.add();
+
+            var dupRaster = raster.duplicate(group, ElementPlacement.PLACEATBEGINNING);
+            var dupPath = path.duplicate(group, ElementPlacement.PLACEATBEGINNING);
+
+            dupPath.clipping = true;
+            group.clipped = true;
+        } else if (path.typename === "CompoundPathItem") {
+            var group = newLayer.groupItems.add();
+
+            var dupRaster = raster.duplicate(group, ElementPlacement.PLACEATBEGINNING);
+            var dupPath = path.duplicate(group, ElementPlacement.PLACEATBEGINNING);
+
+            var dummy = group.pathItems.add();
+            dummy.move(group, ElementPlacement.PLACEATBEGINNING);
+            group.clipped = true;
+            dummy.remove();
+            if (dupPath.pathItems.length > 0) {
+                dupPath.pathItems[0].clipping = true;
+            }
+        }
+    }
 }
 function arraysEqual(arr1, arr2) {
     if (arr1.length !== arr2.length) return false;

@@ -486,21 +486,36 @@ function sliceImage() {
             var group = newLayer.groupItems.add();
 
             // Đặt raster trước (ở dưới)
-            var dupRaster = raster.duplicate(group, ElementPlacement.PLACEATBEGINNING);
+            var dupRaster = raster.duplicate(newLayer, ElementPlacement.PLACEATBEGINNING);
 
         // Nhân bản path vào group (nằm trên)
-            var dupPath = path.duplicate(group, ElementPlacement.PLACEATBEGINNING);
+            var dupPath = path.duplicate(newLayer, ElementPlacement.PLACEATBEGINNING);
+            
             // Đặt path sau (lên trên raster)
-            for (var j = 0; j < dupPath.pathItems.length; j++) {
-                if(dupPath.pathItems[j].evenodd ) {
-                    dupPath.pathItems[j].clipping = true;
-                }
-            }
-            // dupPath.clipping = true;
-            // Thiết lập clipping mask
-            group.clipped = true;
+            // for (var j = 0; j < dupPath.pathItems.length; j++) {
+            //     alert(dupPath.pathItems[j].evenodd);
+            //     if(arraysEqual(dupPath.pathItems[j].position, dupPath.position)) {
+            //         dupPath.pathItems[j].clipping = false;
+            //     } else {
+            //         dupPath.pathItems[j].clipping = true;
+            //     }
+            // }
+            // dupPath.pathItems[0].clipping = true;
+            // // Thiết lập clipping mask
+            // group.clipped = true;
+            app.executeMenuCommand('deselectall');
+            dupRaster.selected = true;
+            dupPath.selected = true;
+            app.executeMenuCommand('makeMask');
         }
     }
 
+}
+function arraysEqual(arr1, arr2) {
+    if (arr1.length !== arr2.length) return false;
+    for (var i = 0; i < arr1.length; i++) {
+        if (arr1[i] !== arr2[i]) return false;
+    }
+    return true;
 }
 sliceImage();

@@ -30,13 +30,15 @@ function makeReferencePoint(black, inner) {
         fill.red = 255; fill.green = 255; fill.blue = 255;
     }
     var noColor = new NoColor();
-
-    [pc0, pc1, pc2, pc3].forEach(function(pos) {
+    var group = doc.groupItems.add();
+    var refP = [pc0, pc1, pc2, pc3];
+    for (var i = 0; i < 4; ++i) {
         var c = doc.pathItems.ellipse(0, 0, d, d);
-        c.position = pos;
+        c.position = refP[i];
         c.fillColor = fill;
         c.strokeColor = noColor;
-    });
+        c.move(group, ElementPlacement.PLACEATBEGINNING);
+    }
 }
 
 function fitArtboardToSelectedArt() {
